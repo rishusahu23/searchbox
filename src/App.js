@@ -1,26 +1,73 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Items from './Items'
+import './App.css'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component{
+  constructor(){
+    super()
+    this.state={
+      datas:[],
+      query:"",
+      filterData:[]
+    }
+
+  }
+
+fetchData=()=>{
+  fetch("https://jsonplaceholder.typicode.com/comments")
+  .then(response=>response.json())
+  .then(
+    data=>{this.setState({datas:data,filterData:data})}
+    )
+  
+  
 }
+
+
+  componentDidMount(){
+    this.fetchData()
+    
+  }
+
+  handleInputChange=(event)=>{
+        const query=event.target.value;
+        this.setState(prev=>{
+          const filterData=prev.datas.filter(data=>{
+            return data.name.toLowerCase().includes(query.toLowerCase())
+          })
+          return{filterData:filterData,query:query}
+        })
+  }
+
+  render(){
+
+    const newList=this.state.filterData.map(data=>
+      <Items id={data.id} data={data} /> )
+
+    return(
+      <div>
+
+
+         <div className="searchbox">
+             <form className="form">
+                <input
+                  placeholder="Search for..."
+                  value={this.state.query}
+                  type="text"
+                  onChange={this.handleInputChange}
+                />
+             </form>
+
+         </div>
+
+
+            <div className="flex-container">
+               {newList}
+            </div>
+      </div>
+      )
+  }
+}
+
 
 export default App;
